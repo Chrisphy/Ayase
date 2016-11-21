@@ -1,3 +1,6 @@
+extern crate chrono;
+
+use self::chrono::*;
 use serenity::client::Context;
 use serenity::model::{Message, Channel};
 use serenity::utils::Colour;
@@ -35,6 +38,7 @@ pub fn member_info(context: Context, message: Message, _args: Vec<String>) {
             return;
         }
     };
+
     let ayy: Vec<String> = roles.into_iter().map(|x| x.name).collect();
     let _ = context.send_message(message.channel_id, |m| {
         m.embed(|e| {
@@ -53,10 +57,17 @@ pub fn member_info(context: Context, message: Message, _args: Vec<String>) {
                 .field(|f| {
                     f.inline(false)
                         .name("Roles")
-                        .value(&format!("{}", ayy.join(", ")))
+                        .value(&ayy.join(", "))
+                })
+                .field(|f| {
+                    f.inline(false)
+                        .name("Join Date")
+                        .value(&format!("{}/{}/{}",
+                                        b.joined_at.parse::<DateTime<UTC>>().unwrap().month(),
+                                        b.joined_at.parse::<DateTime<UTC>>().unwrap().day(),
+                                        b.joined_at.parse::<DateTime<UTC>>().unwrap().year()))
                 })
                 .thumbnail(|f| f.url(&avatar))
         })
     });
-
 }
