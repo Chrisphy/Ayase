@@ -1,19 +1,22 @@
 extern crate serenity;
-extern crate hyper;
-extern crate serde_json;
+extern crate yaml_rust;
 
 mod commands;
 
-use hyper::client::Client as c;
-use serde_json::Value;
-use std::io::Read;
-use commands::info;
-use serenity::client::Context;
+use std::fs::File;
+use std::io::prelude::*;
+use yaml_rust::yaml;
+use commands::{fun, info};
 use serenity::Client;
-use serenity::model::Message;
 
 fn main() {
-    let mut client = Client::login_bot("token");
+    let mut f = File::open("config.yaml").unwrap();
+    let mut s = String::new();
+    f.read_to_string(&mut s).unwrap();
+
+    let docs = yaml::YamlLoader::load_from_str(&s).unwrap();
+    let doc = &docs[0];
+    let mut client = Client::login_bot(&doc["token"][0].as_str().unwrap());
     client.on_message(|_context, message| {
         println!("Received message: {:?}", message.content);
     });
@@ -29,19 +32,9 @@ fn main() {
                     .allow_whitespace(false)
                     .prefix("~")
             })
-            .on("cat", cat_command)
+            .on("cat", fun::cat_command)
             .on("info", info::member_info)
     });
 
     let _ = client.start();
-}
-
-fn cat_command(context: Context, _msg: Message, _args: Vec<String>) {
-    let c = c::new();
-    let mut res = c.get("http://random.cat/meow").send().unwrap();
-    let mut content = String::new();
-    res.read_to_string(&mut content);
-    let data: Value = serde_json::from_str(&content).unwrap();
-    let _ = context.say(&format!("{}",
-                                 data.as_object().unwrap().get("file").unwrap().as_str().unwrap()));
 }

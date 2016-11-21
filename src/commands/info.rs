@@ -8,6 +8,9 @@ use serenity::client::STATE;
 
 pub fn member_info(context: Context, message: Message, _args: Vec<String>) {
     let member = message.mentions;
+    if member.is_empty() {
+        let _ = context.say("You must mention someome to view info about them.");
+    }
     let guild_id = match STATE.lock().unwrap().get_channel(message.channel_id) {
         Some(Channel::Public(channel)) => channel.guild_id,
         Some(_) => {
