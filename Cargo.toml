@@ -8,3 +8,4 @@ serenity = {git = "https://github.com/zeyla/serenity.rs.git"}
 hyper = "0.9"
 serde_json = "0.8.3"
 chrono = "0.2.25"
+yaml-rust = "*"

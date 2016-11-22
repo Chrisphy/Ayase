@@ -34,6 +34,7 @@ fn main() {
             })
             .on("cat", fun::cat_command)
             .on("info", info::member_info)
+            .on("server", info::guild_info)
     });
 
     let _ = client.start();
